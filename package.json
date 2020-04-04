@@ -19,7 +19,12 @@
     "@angular/platform-browser": "~9.0.2",
     "@angular/platform-browser-dynamic": "~9.0.2",
     "@angular/router": "~9.0.2",
+    "@tensorflow-models/coco-ssd": "2.0.1",
+    "@tensorflow-models/mobilenet": "2.0.4",
+    "@tensorflow-models/posenet": "^2.2.1",
+    "@tensorflow/tfjs": "1.7.0",
     "rxjs": "~6.5.4",
+    "subsink": "^1.0.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
