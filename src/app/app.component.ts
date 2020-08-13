@@ -3,7 +3,7 @@ import { from, defer, animationFrameScheduler, timer, of, Observable } from 'rxj
 import { concatMap, tap, map, observeOn, takeUntil, repeat } from 'rxjs/operators';
 
 // import tf model <COCO-SSD>
-import * as cocoSSD from '@tensorflow-models/coco-ssd';
+// import * as cocoSSD from '@tensorflow-models/coco-ssd';
 import * as mobileNET from '@tensorflow-models/mobilenet';
 import * as posenet from '@tensorflow-models/posenet';
 import { SubSink } from 'subsink';
@@ -33,33 +33,33 @@ export class AppComponent implements OnInit {
 
   public async predictWithModel() {
     // defaulted to lite_mobilenet_v2
-    const model = await cocoSSD.load();
+    // const model = await cocoSSD.load();
     // const model = await mobileNET.load();
-    this.detectFrame(this.video, model);
+    // this.detectFrame(this.video, model);
 
-    // await this.video.addEventListener('loadeddata', (async () => {
-    //   console.log('loaded data');
-    //   // Posenet
-    //   const action$ = (model: posenet.PoseNet) =>
-    //     defer(() => model.estimateMultiplePoses(this.video)).pipe(
-    //       observeOn(animationFrameScheduler),
-    //       tap((predictions: posenet.Pose[]) => this.renderPosenetPredictions(predictions)),
-    //       takeUntil(timer(1000)),
-    //       repeat()
-    //     );
+    await this.video.addEventListener('loadeddata', (async () => {
+      console.log('loaded data');
+      // Posenet
+      const action$ = (model: posenet.PoseNet) =>
+        defer(() => model.estimateMultiplePoses(this.video)).pipe(
+          observeOn(animationFrameScheduler),
+          tap((predictions: posenet.Pose[]) => this.renderPosenetPredictions(predictions)),
+          takeUntil(timer(1000)),
+          repeat()
+        );
 
-    //   this.subs.add(
-    //     from(posenet.load({
-    //       architecture: 'ResNet50',
-    //       outputStride: 32,
-    //       inputResolution: 257,
-    //       quantBytes: 2
-    //     })).pipe(
-    //       concatMap(model => this.loadImage$().pipe(map(() => model))),
-    //       concatMap(model => action$(model)),
-    //     ).subscribe()
-    //   );
-    // }));
+      this.subs.add(
+        from(posenet.load({
+          architecture: 'ResNet50',
+          outputStride: 32,
+          inputResolution: 257,
+          quantBytes: 2
+        })).pipe(
+          concatMap(model => this.loadImage$().pipe(map(() => model))),
+          concatMap(model => action$(model)),
+        ).subscribe()
+      );
+    }));
 
 
   }
@@ -71,7 +71,7 @@ export class AppComponent implements OnInit {
       .getUserMedia({
         audio: false,
         video: {
-          facingMode: "user",
+          facingMode: "user", //rear
         }
       })
       .then(stream => {
@@ -110,6 +110,7 @@ export class AppComponent implements OnInit {
 
     let i: number = 0;
     predictions.forEach(prediction => {
+      console.log('prediction: ', prediction);
       i++;
       const x = prediction.bbox[0] + 210;
       const y = prediction.bbox[1] + 70;
@@ -177,7 +178,8 @@ export class AppComponent implements OnInit {
   }
 
   renderPosenetPredictions(k) {
-    // console.log('data: ', k);
+    console.log('data: ', k);
+    debugger;
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
 
